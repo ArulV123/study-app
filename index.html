@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 11 Biology Studio</title>
+<style>
+:root{--bg:#0e1513;--ink:#e7efeb;--mute:#93a79f;--line:#26362f;--pri:#17946b;--pri2:#12805c;--card:#16211d;--soft:#1d332a;--inp:#101a17;--rbg:#173a29;--wbg:#3d1d1f;--bad:#d64b4b;--ok:#35b26a;color-scheme:dark}
+:root[data-theme=light]{--bg:#f3f6f4;--ink:#13261f;--mute:#5d6f67;--line:#d6dfda;--pri:#0d6b4d;--pri2:#0a5640;--card:#fff;--soft:#e3f1ea;--inp:#fff;--rbg:#e2f4e9;--wbg:#fbe6e6;--bad:#c93d3d;--ok:#1f8a4c;color-scheme:light}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input{font:inherit;color:inherit}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:700;line-height:1.2}
+.hide{display:none!important}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:11px 18px;cursor:pointer;font-weight:600;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--pri)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{background:var(--pri2)}
+.btn:focus-visible,input:focus-visible,.ch:focus-visible{outline:3px solid #7cc4a8;outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 22px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+.brand{font:700 20px Georgia,serif;color:var(--pri)}
+/* home */
+.hero{padding:70px 0 40px;max-width:640px}
+.hero h1{font-size:clamp(34px,6vw,56px);margin-bottom:16px}
+.hero p{color:var(--mute);font-size:18px;margin-bottom:28px}
+.hero .btn{font-size:18px;padding:14px 34px}
+/* chapters */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin:22px 0}
+.ch{display:flex;gap:14px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s,transform .15s}
+.ch:hover{border-color:var(--pri);transform:translateY(-2px)}
+.ch b{flex:0 0 40px;height:40px;border-radius:10px;background:var(--soft);color:var(--pri);display:grid;place-items:center;font-family:Georgia,serif}
+.ch span{display:block;font-weight:600;line-height:1.3}
+.ch small{color:var(--mute)}
+/* chapter page */
+.lead{color:var(--mute);margin:6px 0 22px}
+.notes{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 24px;margin-bottom:26px}
+.notes li{margin:14px 0 14px 18px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:12px 0}
+.q p{font-weight:600;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--pri)}
+.opt.right{background:var(--rbg);border-color:var(--ok)}
+.opt.wrong{background:var(--wbg);border-color:var(--bad)}
+#score{font-weight:600;color:var(--pri);margin-top:8px}
+/* call lobby */
+.lobby{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
+@media(max-width:760px){.lobby{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px}
+.panel label{display:block;color:var(--mute);font-size:14px;margin:16px 0 5px}
+.panel input[type=text]{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:var(--inp)}
+.row{display:flex;gap:10px;margin-top:16px}
+.row .btn{flex:1}
+.chk{display:flex;gap:8px;align-items:center;margin-top:16px;color:var(--mute);font-size:14px}
+#err{color:var(--bad);font-size:14px;margin-top:12px;min-height:20px}
+.pv{position:relative;border-radius:12px;overflow:hidden;background:#111;aspect-ratio:16/9}
+.pv video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.hint{color:var(--mute);font-size:14px;margin-top:10px}
+/* call */
+#call{position:fixed;z-index:20;inset:0;background:#10161a;color:#eef3f1;display:flex;flex-direction:column}
+#top{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:10px;flex-wrap:wrap}
+#code{background:#1b252b;border:1px solid #2c3a42;border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:600}
+#grid{flex:1;display:grid;gap:10px;padding:0 12px 10px;overflow:auto;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));grid-auto-rows:minmax(200px,1fr)}
+.tile{position:relative;background:#000;border-radius:14px;overflow:hidden}
+.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile.me video{transform:scaleX(-1)}
+.tile.sharing video{transform:none;object-fit:contain}
+.tag{position:absolute;left:12px;bottom:10px;font-size:14px;text-shadow:0 1px 3px #000}
+.off{position:absolute;inset:0;display:none;place-items:center;background:#1b252b}
+.off i{width:84px;height:84px;border-radius:50%;background:var(--pri);display:grid;place-items:center;font:700 36px Georgia,serif;font-style:normal}
+.tile.camoff .off{display:grid}
+/* Meet-style audio indicator */
+.meter{position:absolute;right:12px;bottom:10px;width:32px;height:32px;border-radius:50%;background:var(--pri);display:flex;gap:3px;align-items:center;justify-content:center}
+.meter i{width:4px;height:5px;border-radius:2px;background:#fff;transition:height .08s}
+.meter.muted{background:#3a464d;opacity:.8}
+.pv .meter{background:rgba(13,107,77,.95)}
+#bar{display:flex;justify-content:center;gap:12px;padding:14px;flex-wrap:wrap}
+#bar .btn{background:#222e35;border-color:#2c3a42;color:#eef3f1;min-width:118px}
+#bar .btn:hover{border-color:#6fbf9f}
+#bar .btn.on{background:var(--bad);border-color:var(--bad)}
+#bar .btn.leave{background:var(--bad);border-color:var(--bad)}
+#theme{position:fixed;right:16px;bottom:16px;z-index:10;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+#theme i{width:36px;height:20px;border-radius:999px;background:var(--line);position:relative;transition:background .15s}
+#theme i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+#theme[aria-pressed=true] i{background:var(--pri)}
+#theme[aria-pressed=true] i::after{left:18px}
+#theme:focus-visible{outline:3px solid #7cc4a8;outline-offset:2px}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
+.modal .panel{width:min(400px,100%)}
+.modal h3{margin-bottom:6px}
+#toast{z-index:40;position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#13261f;color:#fff;padding:9px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<section id="home" class="wrap">
+  <div class="nav"><div class="brand">Bio Studio</div><div style="color:var(--mute)">Class 11 Biology</div></div>
+  <div class="hero">
+    <h1>Understand biology, one chapter at a time.</h1>
+    <p>Quick revision notes and practice questions for Class 11, plus a live study room where you can learn together on video.</p>
+    <button class="btn pri" id="goStudy">Study Bio</button>
+  </div>
+</section>
+
+<section id="chapters" class="wrap hide">
+  <div class="nav"><div class="brand">Bio Studio</div><button class="btn" id="backHome">Home</button></div>
+  <h2>Choose a chapter</h2>
+  <p class="lead">Notes and practice questions for each chapter. Or join a live study room with the last button.</p>
+  <div class="grid" id="chGrid"></div>
+</section>
+
+<section id="chapter" class="wrap hide">
+  <div class="nav"><div class="brand">Bio Studio</div><button class="btn" id="backCh">All chapters</button></div>
+  <h2 id="cTitle"></h2>
+  <p class="lead" id="cUnit"></p>
+  <h3 style="margin-bottom:10px">Key points</h3>
+  <ul class="notes" id="cNotes"></ul>
+  <h3>Practice</h3>
+  <div id="cQuiz"></div>
+  <p id="score"></p>
+</section>
+
+<section id="lobby" class="wrap hide">
+  <div class="nav"><div class="brand">Bio Studio</div><button class="btn" id="backCh2">All chapters</button></div>
+  <h2 style="margin-bottom:20px">Study Bio With Me</h2>
+  <div class="lobby">
+    <div>
+      <div class="pv"><video id="preview" autoplay muted playsinline></video><div class="meter" id="pvMeter"><i></i><i></i><i></i></div></div>
+      <p class="hint">Speak to test your mic. The bars in the corner move when your voice is picked up. You will not hear yourself, which prevents echo.</p>
+    </div>
+    <div class="panel">
+      <label for="name" style="margin-top:0">Your name</label>
+      <input id="name" type="text" maxlength="24" placeholder="e.g. Priya">
+      <div class="row"><button class="btn pri" id="create">Start a study room</button></div>
+      <label for="join">Or join with a room code</label>
+      <div class="row" style="margin-top:0"><input id="join" type="text" placeholder="e.g. meet-k7x2qd" style="flex:1;padding:11px 13px;border:1px solid var(--line);border-radius:8px"><button class="btn" id="joinBtn" style="flex:0 0 auto">Join</button></div>
+      <label class="chk"><input type="checkbox" id="relay"> Hide my IP address (needs a TURN server)</label>
+      <p id="err" role="alert"></p>
+    </div>
+  </div>
+</section>
+
+<section id="call" class="hide">
+  <div id="top"><div>Room code <span id="code" title="Click to copy"></span></div><div id="count" style="color:#9fb0a9"></div></div>
+  <div id="grid"></div>
+  <div id="bar">
+    <button class="btn" id="micBtn">Mute</button>
+    <button class="btn" id="camBtn">Stop camera</button>
+    <button class="btn" id="shareBtn">Share screen</button>
+    <button class="btn leave" id="leaveBtn">Leave</button>
+  </div>
+</section>
+<button id="theme" aria-pressed="false"><span>Light mode</span><i></i></button>
+<div class="modal hide" id="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
+  <div class="panel">
+    <h3 id="gt">please wait future features are comming</h3>
+    <p class="hint" style="margin:0 0 6px">Ask admin for password</p>
+    <label for="pw" style="margin-top:10px">Password</label>
+    <input id="pw" type="password" autocomplete="off" style="width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:var(--inp)">
+    <p id="pwErr" role="alert" style="color:var(--bad);font-size:14px;min-height:20px;margin-top:8px"></p>
+    <div class="row" style="margin-top:6px"><button class="btn" id="pwCancel">Cancel</button><button class="btn pri" id="pwOk">Enter</button></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+/* ===== CONFIG: signaling and relay ===== */
+const SIGNALING = {};   // {} = PeerJS public server. Self-host: {host:'your.domain',port:443,path:'/',secure:true}
+const ICE_SERVERS = [{urls:'stun:stun.l.google.com:19302'}];
+const TURN_SERVERS = []; // e.g. {urls:'turn:turn.example.com:443?transport=tcp',username:'u',credential:'p'}
+
+/* ===== CHAPTER CONTENT (NCERT Class 11) ===== */
+const CH = [
+{t:'The Living World',u:'Unit 1: Diversity in the Living World',n:[
+'Defining features of life: growth, reproduction, metabolism, cellular organisation and response to stimuli. Metabolism is the one feature found in all living things.',
+'Taxonomic hierarchy from lowest to highest: Species, Genus, Family, Order, Class, Phylum (Division in plants), Kingdom.',
+'Binomial nomenclature was introduced by Carolus Linnaeus. The genus name starts with a capital letter, the species epithet with a small letter, and both are italicised, e.g. <i>Mangifera indica</i>.',
+'Taxonomic aids: herbarium, botanical gardens, museums, zoological parks and keys.'],
+q:[['Who introduced binomial nomenclature?',['Whittaker','Linnaeus','Darwin','Mendel'],1],['Which is the correct order from lowest to highest rank?',['Genus, Species, Family','Species, Genus, Family','Family, Genus, Species','Order, Family, Genus'],1]]},
+{t:'Biological Classification',u:'Unit 1: Diversity in the Living World',n:[
+'R.H. Whittaker proposed the five kingdom system (1969): Monera, Protista, Fungi, Plantae, Animalia.',
+'Monera: prokaryotes such as bacteria, cyanobacteria and archaebacteria. Cell wall contains peptidoglycan.',
+'Protista: unicellular eukaryotes such as diatoms, dinoflagellates, euglenoids, slime moulds and protozoans.',
+'Fungi: heterotrophic, absorb nutrients, cell wall made of chitin, body made of hyphae forming a mycelium.',
+'Viruses have a nucleic acid core and protein coat and are not placed in any kingdom. Viroids are free RNA. Lichens are a symbiosis of algae and fungi.'],
+q:[['Fungal cell walls are made of:',['Cellulose','Peptidoglycan','Chitin','Lignin'],2],['Which kingdom contains prokaryotes?',['Protista','Fungi','Plantae','Monera'],3]]},
+{t:'Plant Kingdom',u:'Unit 1: Diversity in the Living World',n:[
+'Algae: chlorophyll-bearing, simple thalloid body, classified as green, brown and red algae (e.g. <i>Spirogyra</i>).',
+'Bryophytes (mosses, liverworts) are called the amphibians of the plant kingdom because they need water for fertilisation.',
+'Pteridophytes (ferns) were the first terrestrial plants with xylem and phloem.',
+'Gymnosperms have naked seeds (<i>Cycas</i>, <i>Pinus</i>). Angiosperms have seeds enclosed in fruits and are divided into monocots and dicots.',
+'Plants show alternation of generations between a haploid gametophyte and a diploid sporophyte.'],
+q:[['Amphibians of the plant kingdom are:',['Algae','Bryophytes','Gymnosperms','Pteridophytes'],1],['Seeds enclosed inside fruits are found in:',['Gymnosperms','Ferns','Angiosperms','Mosses'],2]]},
+{t:'Animal Kingdom',u:'Unit 1: Diversity in the Living World',n:[
+'Classification is based on symmetry, body cavity (coelom), segmentation, germ layers and presence of a notochord.',
+'Porifera (sponges) have a canal system. Cnidaria have stinging cells called cnidoblasts and are diploblastic.',
+'Platyhelminthes are flatworms and acoelomate. Annelida show metameric segmentation.',
+'Arthropoda is the largest phylum, with jointed appendages and a chitinous exoskeleton.',
+'Echinodermata have a water vascular system. Chordata have a notochord, dorsal hollow nerve cord and gill slits at some stage.'],
+q:[['The largest phylum in the animal kingdom is:',['Mollusca','Arthropoda','Annelida','Chordata'],1],['Water vascular system is a feature of:',['Echinodermata','Cnidaria','Porifera','Annelida'],0]]},
+{t:'Morphology of Flowering Plants',u:'Unit 2: Structural Organisation',n:[
+'Root systems: tap root (dicots), fibrous root (monocots) and adventitious roots. Root regions: root cap, meristematic, elongation and maturation zones.',
+'Leaf venation is reticulate in dicots and parallel in monocots. Phyllotaxy can be alternate, opposite or whorled.',
+'A flower has four whorls: calyx, corolla, androecium (male, stamens) and gynoecium (female, carpels).',
+'After fertilisation the ovary becomes the fruit and the ovules become seeds.',
+'A dicot seed has two cotyledons. A monocot seed has one cotyledon and a distinct endosperm.'],
+q:[['Parallel venation is typical of:',['Dicots','Monocots','Gymnosperms','Algae'],1],['The male reproductive whorl of a flower is the:',['Calyx','Corolla','Androecium','Gynoecium'],2]]},
+{t:'Cell: The Unit of Life',u:'Unit 3: Cell: Structure and Functions',n:[
+'Cell theory: Schleiden and Schwann proposed that all organisms are made of cells. Virchow added that new cells arise from pre-existing cells.',
+'Prokaryotes lack a membrane-bound nucleus and have 70S ribosomes. Eukaryotes have 80S ribosomes and membrane-bound organelles.',
+'Mitochondria are the sites of aerobic respiration (ATP production). Golgi apparatus packages and secretes materials. Lysosomes contain hydrolytic enzymes.',
+'The fluid mosaic model of the plasma membrane was proposed by Singer and Nicolson (1972).',
+'The nucleus contains chromatin and the nucleolus, which is the site of rRNA synthesis.'],
+q:[['The fluid mosaic model was proposed by:',['Singer and Nicolson','Watson and Crick','Schleiden and Schwann','Robert Hooke'],0],['Ribosomes of prokaryotes are of the type:',['80S','70S','60S','90S'],1]]},
+{t:'Biomolecules',u:'Unit 3: Cell: Structure and Functions',n:[
+'Major biomolecules: carbohydrates, proteins, lipids and nucleic acids.',
+'Proteins are polymers of 20 types of amino acids joined by peptide bonds, with primary, secondary, tertiary and quaternary structure.',
+'Enzymes are biological catalysts, mostly proteins, that lower the activation energy of a reaction.',
+'Enzyme activity depends on temperature, pH and substrate concentration. In competitive inhibition the inhibitor resembles the substrate.',
+'Nucleic acids (DNA and RNA) are polymers of nucleotides made of a sugar, a phosphate and a nitrogenous base.'],
+q:[['Amino acids are linked together by:',['Glycosidic bonds','Peptide bonds','Hydrogen bonds','Ester bonds'],1],['Enzymes speed up reactions by:',['Raising temperature','Lowering activation energy','Adding energy','Changing the products'],1]]},
+{t:'Cell Cycle and Cell Division',u:'Unit 3: Cell: Structure and Functions',n:[
+'The cell cycle has interphase (G1, S, G2) and the M phase. DNA replicates in the S phase.',
+'Mitosis has four stages: prophase, metaphase, anaphase and telophase. Chromosomes line up at the equator in metaphase and sister chromatids separate in anaphase.',
+'Meiosis involves two divisions and gives four haploid cells from one diploid cell.',
+'In prophase I: synapsis occurs in zygotene and crossing over occurs in pachytene.',
+'Mitosis gives genetically identical cells for growth and repair. Meiosis creates variation.'],
+q:[['DNA replication takes place in:',['G1 phase','S phase','G2 phase','M phase'],1],['Crossing over occurs in which substage?',['Leptotene','Zygotene','Pachytene','Diakinesis'],2]]},
+{t:'Photosynthesis in Higher Plants',u:'Unit 4: Plant Physiology',n:[
+'Chloroplast: light reactions occur in the grana (thylakoids) and the Calvin cycle in the stroma. Pigments include chlorophyll a, chlorophyll b and carotenoids.',
+'Light reaction: water splits at photosystem II releasing O<sub>2</sub>, and ATP and NADPH are produced.',
+'Calvin cycle (C3): RuBisCO fixes CO<sub>2</sub> to RuBP, and the first stable product is 3-phosphoglyceric acid (3-PGA).',
+'C4 plants have Kranz anatomy. PEP carboxylase fixes CO<sub>2</sub> first into oxaloacetic acid (OAA), a 4-carbon compound. They show little photorespiration.',
+'Factors affecting photosynthesis: light, CO<sub>2</sub> concentration, temperature and water.'],
+q:[['The first stable product of the C3 cycle is:',['OAA','3-PGA','RuBP','Glucose'],1],['The enzyme that carboxylates RuBP is:',['PEP carboxylase','ATP synthase','RuBisCO','Amylase'],2]]},
+{t:'Breathing and Exchange of Gases',u:'Unit 5: Human Physiology',n:[
+'Inspiration happens when the diaphragm and external intercostal muscles contract, increasing lung volume and lowering pressure.',
+'Tidal volume is about 500 mL of air per normal breath. Vital capacity is the maximum air that can be breathed out after a deep inspiration.',
+'Gas exchange occurs by simple diffusion across the alveolar membrane, driven by partial pressure differences.',
+'About 97% of oxygen is carried by haemoglobin. About 70% of CO<sub>2</sub> is carried as bicarbonate, with the help of carbonic anhydrase.',
+'The respiratory rhythm centre is in the medulla. The pneumotaxic centre in the pons moderates its function. Disorders include asthma and emphysema.'],
+q:[['Normal tidal volume in a human adult is about:',['100 mL','500 mL','1200 mL','3000 mL'],1],['Most CO\u2082 is transported in blood as:',['Dissolved CO\u2082','Carbaminohaemoglobin','Bicarbonate','Carbon monoxide'],2]]}
+];
+
+const $=id=>document.getElementById(id);
+const views=['home','chapters','chapter','lobby','call'];
+function show(v){views.forEach(x=>$(x).classList.toggle('hide',x!==v));window.scrollTo(0,0)}
+
+/* ---- chapter list ---- */
+const g=$('chGrid');
+CH.forEach((c,i)=>{
+  const b=document.createElement('button');b.className='ch';
+  b.innerHTML=`<b>${i+1}</b><div><span>${c.t}</span><small>${c.u.split(': ')[1]}</small></div>`;
+  b.onclick=()=>openCh(i);g.appendChild(b);
+});
+const live=document.createElement('button');live.className='ch';
+live.innerHTML=`<b>${CH.length+1}</b><div><span>future feature admin</span><small>will open in future admin only</small></div>`;
+live.onclick=openGate;g.appendChild(live);
+
+/* ---- password gate (kept in memory only: a refresh returns to the main page and asks again) ---- */
+const PW_HASH='7de64d9bb8be44dd3a17fbb2f42d4695e8f0372223ee9ecf8e2f59cb00eb1100';
+async function sha(t){
+  if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  return null;
+}
+function openGate(){$('pw').value='';$('pwErr').textContent='';$('gate').classList.remove('hide');$('pw').focus()}
+function closeGate(){$('gate').classList.add('hide')}
+async function checkPw(){
+  const v=$('pw').value.trim().toLowerCase();
+  const h=await sha(v);
+  if((h!==null&&h===PW_HASH)||(h===null&&v==='67 love bio')){closeGate();openLobby()}
+  else{$('pwErr').textContent='Wrong password. Try again.';$('pw').select()}
+}
+$('pwOk').onclick=checkPw;$('pwCancel').onclick=closeGate;
+$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')checkPw();if(e.key==='Escape')closeGate()});
+
+/* ---- light / dark mode (the call screen is always dark) ---- */
+function setTheme(light){
+  document.documentElement.dataset.theme=light?'light':'dark';
+  $('theme').setAttribute('aria-pressed',light);
+  try{localStorage.setItem('bio-theme',light?'light':'dark')}catch(e){}
+}
+$('theme').onclick=()=>setTheme($('theme').getAttribute('aria-pressed')!=='true');
+let _t=null;try{_t=localStorage.getItem('bio-theme')}catch(e){}
+setTheme(_t==='light');
+
+function openCh(i){
+  const c=CH[i];$('cTitle').textContent=c.t;$('cUnit').textContent=c.u;
+  $('cNotes').innerHTML=c.n.map(x=>`<li>${x}</li>`).join('');
+  const box=$('cQuiz');box.innerHTML='';let score=0,done=0;$('score').textContent='';
+  c.q.forEach(([q,o,a])=>{
+    const d=document.createElement('div');d.className='q';d.innerHTML=`<p>${q}</p>`;
+    o.forEach((t,k)=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=t;
+      b.onclick=()=>{
+        [...d.querySelectorAll('.opt')].forEach((x,j)=>{x.disabled=true;if(j===a)x.classList.add('right')});
+        if(k===a)score++;else b.classList.add('wrong');
+        if(++done===c.q.length)$('score').textContent=`Your score: ${score} of ${c.q.length}`;
+      };d.appendChild(b);
+    });box.appendChild(d);
+  });
+  show('chapter');
+}
+$('goStudy').onclick=()=>show('chapters');
+$('backHome').onclick=()=>show('home');
+$('backCh').onclick=$('backCh2').onclick=()=>{stopPreview();show('chapters')};
+
+/* ---- audio level meter (Meet-style bars, no speaker ranking) ---- */
+let AC;
+function meter(stream,el){
+  if(!stream||!stream.getAudioTracks().length)return;
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume();
+  const an=AC.createAnalyser();an.fftSize=256;an.smoothingTimeConstant=.5;
+  const src=AC.createMediaStreamSource(new MediaStream(stream.getAudioTracks()));src.connect(an);
+  const d=new Uint8Array(an.frequencyBinCount),bars=el.querySelectorAll('i'),k=[1.0,1.7,1.2];
+  (function tick(){
+    if(!el.isConnected){src.disconnect();return}
+    an.getByteFrequencyData(d);let s=0;for(let i=0;i<d.length;i++)s+=d[i];
+    const lv=Math.min(1,s/d.length/255*4);
+    bars.forEach((b,i)=>b.style.height=(5+Math.min(1,lv*k[i])*18)+'px');
+    requestAnimationFrame(tick);
+  })();
+}
+
+/* ---- media ---- */
+const S={peer:null,stream:null,screen:null,calls:{},data:{},name:'',micOn:true,camOn:true,pvOn:false};
+const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2500)};
+const fail=m=>$('err').textContent=m;
+async function getMedia(){
+  if(S.stream)return S.stream;
+  S.stream=await navigator.mediaDevices.getUserMedia({
+    video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30}},
+    audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+  return S.stream;
+}
+async function openLobby(){
+  show('lobby');$('err').textContent='';
+  try{$('preview').srcObject=await getMedia();if(!S.pvOn){meter(S.stream,$('pvMeter'));S.pvOn=true}}
+  catch(e){fail('Allow camera and mic access, and open this page over https or localhost.')}
+  $('relay').disabled=!TURN_SERVERS.length;
+  const h=location.hash.slice(1);if(h)$('join').value=h;
+}
+function stopPreview(){}
+
+/* ---- tiles ---- */
+function addTile(id,name,stream,me){
+  let t=$('tile-'+id);
+  if(!t){
+    t=document.createElement('div');t.id='tile-'+id;t.className='tile'+(me?' me':'');
+    t.innerHTML='<video autoplay playsinline></video><div class="off"><i></i></div><div class="tag"></div><div class="meter"><i></i><i></i><i></i></div>';
+    $('grid').appendChild(t);
+    const v=t.querySelector('video');if(me)v.muted=true;
+    v.srcObject=stream;v.play&&v.play().catch(()=>{});
+    meter(stream,t.querySelector('.meter'));
+  }
+  t.querySelector('.tag').textContent=me?name+' (you)':name;
+  t.querySelector('.off i').textContent=(name||'?')[0].toUpperCase();
+  count();
+}
+const removeTile=id=>{const t=$('tile-'+id);t&&t.remove();count()};
+function count(){const n=$('grid').children.length;$('count').textContent=n+(n===1?' participant':' participants')}
+
+/* ---- peers ---- */
+function makePeer(id){
+  const relay=$('relay').checked&&TURN_SERVERS.length;
+  return new Peer(id,{...SIGNALING,config:{iceServers:[...ICE_SERVERS,...TURN_SERVERS],iceTransportPolicy:relay?'relay':'all'}});
+}
+function randCode(){const c='abcdefghjkmnpqrstuvwxyz23456789';let s='';crypto.getRandomValues(new Uint8Array(8)).forEach(n=>s+=c[n%c.length]);return 'meet-'+s}
+async function enter(code,host){
+  S.name=$('name').value.trim()||'Student';
+  try{await getMedia()}catch(e){return fail('Camera and mic access is required.')}
+  $('err').textContent='';
+  const p=S.peer=makePeer(host?code:undefined);
+  p.on('error',e=>{
+    if(e.type==='unavailable-id')return fail('That room code is taken. Try again.');
+    if(e.type==='peer-unavailable'){leave();fail('No room found with that code.');return}
+    toast('Connection issue: '+e.type);
+  });
+  p.on('open',()=>{
+    show('call');$('code').textContent=code;addTile('me',S.name,S.stream,true);
+    if(!host)joinGuest(code);
+  });
+  p.on('call',c=>{c.answer(S.stream);wire(c)});
+  p.on('connection',conn=>{
+    conn.on('open',()=>{
+      conn.send({type:'peers',ids:[...new Set([...Object.keys(S.calls),...Object.keys(S.data)])].filter(i=>i!==conn.peer)});
+      S.data[conn.peer]=conn;
+    });
+    conn.on('close',()=>delete S.data[conn.peer]);
+  });
+}
+function joinGuest(hostId){
+  const conn=S.peer.connect(hostId,{reliable:true});
+  conn.on('data',m=>{if(m.type==='peers')m.ids.forEach(callPeer)});
+  conn.on('open',()=>callPeer(hostId));
+}
+function callPeer(id){
+  if(S.calls[id]||id===S.peer.id)return;
+  wire(S.peer.call(id,S.stream,{metadata:{name:S.name}}));
+}
+function wire(call){
+  const id=call.peer;S.calls[id]=call;
+  call.on('stream',s=>addTile(id,(call.metadata&&call.metadata.name)||'Student',s,false));
+  const gone=()=>{delete S.calls[id];removeTile(id)};
+  call.on('close',gone);call.on('error',gone);
+}
+
+/* ---- controls ---- */
+const setTrack=(k,on)=>S.stream.getTracks().filter(t=>t.kind===k).forEach(t=>t.enabled=on);
+$('micBtn').onclick=()=>{
+  S.micOn=!S.micOn;setTrack('audio',S.micOn);
+  $('micBtn').textContent=S.micOn?'Mute':'Unmute';$('micBtn').classList.toggle('on',!S.micOn);
+  $('tile-me').querySelector('.meter').classList.toggle('muted',!S.micOn);
+};
+$('camBtn').onclick=()=>{
+  S.camOn=!S.camOn;setTrack('video',S.camOn);
+  $('camBtn').textContent=S.camOn?'Stop camera':'Start camera';$('camBtn').classList.toggle('on',!S.camOn);
+  $('tile-me').classList.toggle('camoff',!S.camOn);
+};
+function swapVideo(track){
+  Object.values(S.calls).forEach(c=>{const s=c.peerConnection.getSenders().find(x=>x.track&&x.track.kind==='video');s&&s.replaceTrack(track)});
+}
+$('shareBtn').onclick=async()=>{
+  if(S.screen)return stopShare();
+  try{
+    S.screen=await navigator.mediaDevices.getDisplayMedia({video:true});
+    const t=S.screen.getVideoTracks()[0];swapVideo(t);t.onended=stopShare;
+    $('tile-me').classList.add('sharing');$('tile-me').querySelector('video').srcObject=S.screen;
+    $('shareBtn').textContent='Stop sharing';
+  }catch(e){}
+};
+function stopShare(){
+  if(!S.screen)return;
+  S.screen.getTracks().forEach(t=>t.stop());S.screen=null;swapVideo(S.stream.getVideoTracks()[0]);
+  $('tile-me').classList.remove('sharing');$('tile-me').querySelector('video').srcObject=S.stream;
+  $('shareBtn').textContent='Share screen';
+}
+function leave(){
+  stopShare();Object.values(S.calls).forEach(c=>c.close());
+  S.peer&&S.peer.destroy();S.peer=null;S.calls={};S.data={};$('grid').innerHTML='';
+  S.micOn=S.camOn=true;setTrack('audio',true);setTrack('video',true);
+  $('micBtn').textContent='Mute';$('camBtn').textContent='Stop camera';$('micBtn').classList.remove('on');$('camBtn').classList.remove('on');
+  show('lobby');
+}
+$('leaveBtn').onclick=leave;
+$('code').onclick=()=>navigator.clipboard.writeText($('code').textContent).then(()=>toast('Room code copied'));
+$('create').onclick=()=>enter(randCode(),true);
+$('joinBtn').onclick=()=>{const c=$('join').value.trim().toLowerCase();if(!c)return fail('Enter a room code.');enter(c,false)};
+$('join').addEventListener('keydown',e=>{if(e.key==='Enter')$('joinBtn').click()});
+window.addEventListener('beforeunload',()=>S.peer&&S.peer.destroy());
+</script>
+</body>
+</html>
